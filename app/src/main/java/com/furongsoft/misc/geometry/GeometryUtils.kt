@@ -1,12 +1,17 @@
 package com.furongsoft.misc.geometry
 
-import android.graphics.Point
+import android.graphics.PointF
 
+/**
+ * 几何工具
+ *
+ * @author Alex
+ */
 object GeometryUtils {
     /**
      * 判断点是否在多边形中
      */
-    fun isPointInPolygon(point: Point, polygon: List<Point>): Boolean {
+    fun isPointInPolygon(point: PointF, polygon: List<PointF>): Boolean {
         val px = point.x
         val py = point.y
         var flag = false
@@ -45,6 +50,6 @@ object GeometryUtils {
             i++
         }
 
-        return false
+        return flag
     }
 }
