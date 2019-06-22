@@ -22,6 +22,7 @@ class Ellipse(event: MotionEvent) : IShape(event) {
         dashPaint.strokeWidth = 1f
         dashPaint.color = Color.BLACK
         dashPaint.pathEffect = DashPathEffect(floatArrayOf(1f, 1f), 0f)
+        generateShape()
     }
 
     override fun getVectors(): List<PointF> {
@@ -122,6 +123,6 @@ class Ellipse(event: MotionEvent) : IShape(event) {
         blocks.add(ControlBlock(6, point2.x, point1.y + (point2.y - point1.y) / 2))
         blocks.add(ControlBlock(7, point1.x + (point2.x - point1.x) / 2, point2.y))
 
-        shapeChanged = false
+        super.generateShape()
     }
 }

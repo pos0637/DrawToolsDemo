@@ -7,9 +7,8 @@ import android.graphics.Paint
 import android.util.AttributeSet
 import android.view.MotionEvent
 import android.view.View
-import com.furongsoft.drawtoolsdemo.entities.shapes.Ellipse
 import com.furongsoft.drawtoolsdemo.entities.shapes.IShape
-import com.furongsoft.drawtoolsdemo.entities.shapes.Rectangle
+import com.furongsoft.drawtoolsdemo.entities.shapes.Polygon
 import java.lang.reflect.Constructor
 import java.util.*
 
@@ -25,7 +24,7 @@ class DrawingBoardView : View, View.OnTouchListener {
     /**
      * 形状类型
      */
-    var shapeType: Class<*>? = Rectangle::class.java
+    var shapeType: Class<*>? = Polygon::class.java
 
     /**
      * 当前操作形状

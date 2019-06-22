@@ -20,6 +20,7 @@ class Rectangle(event: MotionEvent) : IShape(event) {
     init {
         point1 = PointF(event.x, event.y)
         point2 = PointF(event.x, event.y)
+        generateShape()
     }
 
     override fun getVectors(): List<PointF> {
@@ -117,6 +118,6 @@ class Rectangle(event: MotionEvent) : IShape(event) {
         blocks.add(ControlBlock(6, point2.x, point1.y + (point2.y - point1.y) / 2))
         blocks.add(ControlBlock(7, point1.x + (point2.x - point1.x) / 2, point2.y))
 
-        shapeChanged = false
+        super.generateShape()
     }
 }
