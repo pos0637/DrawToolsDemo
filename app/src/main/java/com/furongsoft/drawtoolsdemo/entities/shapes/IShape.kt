@@ -10,7 +10,7 @@ import android.view.MotionEvent
  *
  * @author Alex
  */
-abstract class IShape(event: MotionEvent) {
+abstract class IShape(event: MotionEvent?) {
     /**
      * 状态
      */
@@ -43,6 +43,8 @@ abstract class IShape(event: MotionEvent) {
 
     /**
      * 触屏事件
+     *
+     * @return 是否响应该形状触屏事件
      */
     abstract fun onTouch(event: MotionEvent): Boolean
 

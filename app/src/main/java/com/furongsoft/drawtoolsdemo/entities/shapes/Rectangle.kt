@@ -1,6 +1,9 @@
 package com.furongsoft.drawtoolsdemo.entities.shapes
 
-import android.graphics.*
+import android.graphics.Canvas
+import android.graphics.Paint
+import android.graphics.Path
+import android.graphics.PointF
 import android.view.MotionEvent
 import java.util.*
 
@@ -10,18 +13,18 @@ import java.util.*
  * @author Alex
  */
 class Rectangle(event: MotionEvent) : IShape(event) {
-    val blockSize = 3f
-    var point1 = PointF()
-    var point2 = PointF()
-    var path = Path()
-    var blocks = LinkedList<RectF>()
-    var blackPaint = Paint()
+    private val blockSize = 3f
+    private var point1 = PointF()
+    private var point2 = PointF()
+    private var path = Path()
+    private var blocks = LinkedList<ControlBlock>()
+    private var selectedBlockId: Int = -1
+    private var selectedBlockPoint: PointF? = null
+    private var pathChanged = false
 
     init {
         point1 = PointF(event.x, event.y)
         point2 = PointF(event.x, event.y)
-        blackPaint.color = Color.BLACK
-        blackPaint.style = Paint.Style.FILL
     }
 
     override fun getVectors(): List<PointF> {
@@ -45,9 +48,8 @@ class Rectangle(event: MotionEvent) : IShape(event) {
                 }
             }
             Status.editing -> {
-                if (event.action == MotionEvent.ACTION_DOWN) {
-                    status = Status.editing
-                }
+                blocks.forEach { block -> block.onTouch(event) }
+                if (pathChanged) generatePath()
             }
         }
 
@@ -56,7 +58,7 @@ class Rectangle(event: MotionEvent) : IShape(event) {
 
     override fun onDraw(canvas: Canvas, paint: Paint) {
         canvas.drawPath(path, paint)
-        if (status != Status.initialized) blocks.forEach { block -> canvas.drawRect(block, blackPaint) }
+        if (status != Status.initialized) blocks.forEach { block -> block.onDraw(canvas, paint) }
     }
 
     /**
@@ -71,17 +73,83 @@ class Rectangle(event: MotionEvent) : IShape(event) {
         path.lineTo(point1.x, point1.y)
 
         blocks.clear()
-        blocks.add(RectF(point1.x - blockSize, point1.y - blockSize, point1.x + blockSize, point1.y + blockSize))
-        blocks.add(RectF(point2.x - blockSize, point1.y - blockSize, point2.x + blockSize, point1.y + blockSize))
-        blocks.add(RectF(point2.x - blockSize, point2.y - blockSize, point2.x + blockSize, point2.y + blockSize))
-        blocks.add(RectF(point1.x - blockSize, point2.y - blockSize, point1.x + blockSize, point2.y + blockSize))
+        blocks.add(
+            ControlBlock(
+                0,
+                point1.x - blockSize,
+                point1.y - blockSize,
+                point1.x + blockSize,
+                point1.y + blockSize
+            ) { block, event -> onTouchListener(block, event) }
+        )
+        blocks.add(
+            ControlBlock(
+                1,
+                point2.x - blockSize,
+                point1.y - blockSize,
+                point2.x + blockSize,
+                point1.y + blockSize
+            ) { block, event -> onTouchListener(block, event) }
+        )
+        blocks.add(
+            ControlBlock(
+                2,
+                point2.x - blockSize,
+                point2.y - blockSize,
+                point2.x + blockSize,
+                point2.y + blockSize
+            ) { block, event -> onTouchListener(block, event) }
+        )
+        blocks.add(
+            ControlBlock(
+                3,
+                point1.x - blockSize,
+                point2.y - blockSize,
+                point1.x + blockSize,
+                point2.y + blockSize
+            ) { block, event -> onTouchListener(block, event) }
+        )
+
+        pathChanged = false
     }
 
-    private fun checkPointInBlock(event: MotionEvent): RectF? {
-        for (block in blocks) {
-            if (block.contains(event.x, event.y)) return block
+    private fun onTouchListener(block: ControlBlock, event: MotionEvent) {
+        if (event.action == MotionEvent.ACTION_DOWN) {
+            if (block.contains(event)) {
+                selectedBlockId = block.id
+                selectedBlockPoint = PointF(event.x, event.y)
+            }
+            return
+        } else if (event.action == MotionEvent.ACTION_UP) {
+            if (block.id == selectedBlockId) selectedBlockId = -1
+            return
+        } else if (event.action != MotionEvent.ACTION_MOVE) {
+            return
+        } else if (block.id != selectedBlockId) {
+            return
         }
 
-        return null
+        block.offset(event.x - selectedBlockPoint!!.x, event.y - selectedBlockPoint!!.y)
+        selectedBlockPoint = PointF(event.x, event.y)
+        pathChanged = true
+
+        when (block.id) {
+            0 -> {
+                point1.x = block.centerX()
+                point1.y = block.centerY()
+            }
+            1 -> {
+                point2.x = block.centerX()
+                point1.y = block.centerY()
+            }
+            2 -> {
+                point2.x = block.centerX()
+                point2.y = block.centerY()
+            }
+            3 -> {
+                point1.x = block.centerX()
+                point2.y = block.centerY()
+            }
+        }
     }
 }
