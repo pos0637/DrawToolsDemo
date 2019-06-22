@@ -4,13 +4,11 @@ import android.content.Context
 import android.graphics.Canvas
 import android.graphics.Color
 import android.graphics.Paint
-import android.graphics.PointF
 import android.util.AttributeSet
 import android.view.MotionEvent
 import android.view.View
 import com.furongsoft.drawtoolsdemo.entities.shapes.IShape
 import com.furongsoft.drawtoolsdemo.entities.shapes.Rectangle
-import com.furongsoft.misc.geometry.GeometryUtils
 import java.lang.reflect.Constructor
 import java.util.*
 
@@ -66,11 +64,11 @@ class DrawingBoardView : View, View.OnTouchListener {
 
     override fun onTouch(view: View?, event: MotionEvent?): Boolean {
         if (currentShape != null) {
-            onTouchShape(event)
+            onTouchShape(view, event)
         } else if (event?.action == MotionEvent.ACTION_DOWN) {
-            currentShape = shapes.firstOrNull { shape -> isPointInPolygon(event, shape) }
+            currentShape = shapes.firstOrNull { shape -> shape.contains(event) }
             if (currentShape != null) {
-                onTouchShape(event)
+                onTouchShape(view, event)
             } else if (shapeType != null) {
                 onCreateShape(event)
             }
@@ -92,9 +90,12 @@ class DrawingBoardView : View, View.OnTouchListener {
         paint.strokeWidth = 1f
     }
 
-    private fun onTouchShape(event: MotionEvent?) {
-        if (!currentShape!!.onTouch(event!!)) {
-            currentShape = null
+    private fun onTouchShape(view: View?, event: MotionEvent?) {
+        if (!currentShape!!.onTouch(view, event!!)) {
+            if (event.action == MotionEvent.ACTION_DOWN) {
+                currentShape?.status = IShape.Status.Initialized
+                currentShape = null
+            }
         }
 
         invalidate()
@@ -105,9 +106,5 @@ class DrawingBoardView : View, View.OnTouchListener {
         currentShape = ctor?.newInstance(event!!) as IShape
         shapes.addFirst(currentShape)
         invalidate()
-    }
-
-    private fun isPointInPolygon(event: MotionEvent, shape: IShape): Boolean {
-        return GeometryUtils.isPointInPolygon(PointF(event.x, event.y), shape.getVectors())
     }
 }

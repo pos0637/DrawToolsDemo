@@ -4,6 +4,7 @@ import android.graphics.Canvas
 import android.graphics.Paint
 import android.graphics.PointF
 import android.view.MotionEvent
+import android.view.View
 
 /**
  * 椭圆
@@ -15,10 +16,24 @@ class Ellipse(event: MotionEvent) : IShape(event) {
         return listOf()
     }
 
-    override fun onTouch(event: MotionEvent): Boolean {
+    override fun contains(event: MotionEvent): Boolean {
+        return false
+    }
+
+    override fun onTouch(view: View?, event: MotionEvent): Boolean {
         return true
     }
 
     override fun onDraw(canvas: Canvas, paint: Paint) {
+    }
+
+    override fun onCreate(view: View?, event: MotionEvent): Boolean {
+        return true
+    }
+
+    override fun onPositionChanged(view: View?, offsetX: Float, offsetY: Float) {
+    }
+
+    override fun onControlBlockChanged(view: View?, block: ControlBlock) {
     }
 }

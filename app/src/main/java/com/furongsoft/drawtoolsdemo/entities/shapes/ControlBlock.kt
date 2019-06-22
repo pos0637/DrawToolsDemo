@@ -2,6 +2,7 @@ package com.furongsoft.drawtoolsdemo.entities.shapes
 
 import android.graphics.*
 import android.view.MotionEvent
+import android.view.View
 
 /**
  * 控制块
@@ -10,11 +11,10 @@ import android.view.MotionEvent
  */
 class ControlBlock(
     id: Int,
-    left: Float,
-    top: Float,
-    right: Float,
-    bottom: Float,
-    onTouchListener: (block: ControlBlock, event: MotionEvent) -> Unit
+    centerX: Float,
+    centerY: Float,
+    touchSize: Int = 5,
+    paintSize: Int = 3
 ) : IShape(null) {
     /**
      * 索引
@@ -22,54 +22,62 @@ class ControlBlock(
     var id = 0
 
     /**
-     * 区域
+     * 触控区域
      */
-    var rect: RectF
+    private var rectTouch: RectF
+
+    /**
+     * 绘图区域
+     */
+    private var rectPaint: RectF
 
     /**
      * 画笔
      */
-    var paint = Paint()
-
-    /**
-     * 触屏事件处理函数
-     */
-    var onTouchListener: (block: ControlBlock, event: MotionEvent) -> Unit
+    private var paint = Paint()
 
     init {
         this.id = id
-        this.onTouchListener = onTouchListener
-        rect = RectF(left, top, right, bottom)
+        rectTouch = RectF(centerX - touchSize, centerY - touchSize, centerX + touchSize, centerY + touchSize)
+        rectPaint = RectF(centerX - paintSize, centerY - paintSize, centerX + paintSize, centerY + paintSize)
         paint.color = Color.BLACK
         paint.style = Paint.Style.FILL
     }
 
     override fun getVectors(): List<PointF> {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+        TODO("not implemented") //To change body of Created functions use File | Settings | File Templates.
     }
 
-    override fun onTouch(event: MotionEvent): Boolean {
-        onTouchListener(this, event)
-        return true
+    override fun contains(event: MotionEvent): Boolean {
+        return rectTouch.contains(event.x, event.y)
+    }
+
+    override fun onTouch(view: View?, event: MotionEvent): Boolean {
+        TODO("not implemented") //To change body of Created functions use File | Settings | File Templates.
     }
 
     override fun onDraw(canvas: Canvas, paint: Paint) {
-        canvas.drawRect(rect, this.paint)
+        canvas.drawRect(rectPaint, this.paint)
     }
 
-    fun contains(event: MotionEvent): Boolean {
-        return rect.contains(event.x, event.y)
+    override fun onCreate(view: View?, event: MotionEvent): Boolean {
+        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
     }
 
-    fun offset(x: Float, y: Float) {
-        rect.offset(x, y)
+    override fun onPositionChanged(view: View?, offsetX: Float, offsetY: Float) {
+        rectTouch.offset(offsetX, offsetY)
+        rectPaint.offset(offsetX, offsetY)
+    }
+
+    override fun onControlBlockChanged(view: View?, block: ControlBlock) {
+        TODO("not implemented") //To change body of Created functions use File | Settings | File Templates.
     }
 
     fun centerX(): Float {
-        return rect.centerX()
+        return rectTouch.centerX()
     }
 
     fun centerY(): Float {
-        return rect.centerY()
+        return rectTouch.centerY()
     }
 }
