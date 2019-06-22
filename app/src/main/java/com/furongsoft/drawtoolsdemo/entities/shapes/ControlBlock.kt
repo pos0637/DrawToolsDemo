@@ -40,8 +40,8 @@ class ControlBlock(
         this.id = id
         rectTouch = RectF(centerX - touchSize, centerY - touchSize, centerX + touchSize, centerY + touchSize)
         rectPaint = RectF(centerX - paintSize, centerY - paintSize, centerX + paintSize, centerY + paintSize)
-        paint.color = Color.BLACK
         paint.style = Paint.Style.FILL
+        paint.color = Color.BLACK
     }
 
     override fun getVectors(): List<PointF> {

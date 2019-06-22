@@ -2,8 +2,8 @@ package com.furongsoft.drawtoolsdemo.entities.shapes
 
 import android.graphics.Canvas
 import android.graphics.Paint
-import android.graphics.Path
 import android.graphics.PointF
+import android.graphics.RectF
 import android.view.MotionEvent
 import android.view.View
 import com.furongsoft.misc.geometry.GeometryUtils
@@ -16,7 +16,6 @@ import com.furongsoft.misc.geometry.GeometryUtils
 class Rectangle(event: MotionEvent) : IShape(event) {
     private var point1 = PointF()
     private var point2 = PointF()
-    private var path = Path()
 
     init {
         point1 = PointF(event.x, event.y)
@@ -32,7 +31,7 @@ class Rectangle(event: MotionEvent) : IShape(event) {
     }
 
     override fun onDraw(canvas: Canvas, paint: Paint) {
-        canvas.drawPath(path, paint)
+        canvas.drawRect(RectF(point1.x, point1.y, point2.x, point2.y), paint)
         if (status != Status.Initialized) onDrawControlBlocks(canvas, paint)
     }
 
@@ -90,24 +89,33 @@ class Rectangle(event: MotionEvent) : IShape(event) {
                 point1.x = block.centerX()
                 point2.y = block.centerY()
             }
+            4 -> {
+                point1.x = block.centerX()
+            }
+            5 -> {
+                point1.y = block.centerY()
+            }
+            6 -> {
+                point2.x = block.centerX()
+            }
+            7 -> {
+                point2.y = block.centerY()
+            }
         }
 
         shapeChanged = true
     }
 
     override fun generateShape() {
-        path.reset()
-        path.moveTo(point1.x, point1.y)
-        path.lineTo(point1.x, point2.y)
-        path.lineTo(point2.x, point2.y)
-        path.lineTo(point2.x, point1.y)
-        path.lineTo(point1.x, point1.y)
-
         blocks.clear()
         blocks.add(ControlBlock(0, point1.x, point1.y))
         blocks.add(ControlBlock(1, point2.x, point1.y))
         blocks.add(ControlBlock(2, point2.x, point2.y))
         blocks.add(ControlBlock(3, point1.x, point2.y))
+        blocks.add(ControlBlock(4, point1.x, point1.y + (point2.y - point1.y) / 2))
+        blocks.add(ControlBlock(5, point1.x + (point2.x - point1.x) / 2, point1.y))
+        blocks.add(ControlBlock(6, point2.x, point1.y + (point2.y - point1.y) / 2))
+        blocks.add(ControlBlock(7, point1.x + (point2.x - point1.x) / 2, point2.y))
 
         shapeChanged = false
     }

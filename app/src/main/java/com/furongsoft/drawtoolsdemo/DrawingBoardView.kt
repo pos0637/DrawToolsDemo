@@ -7,6 +7,7 @@ import android.graphics.Paint
 import android.util.AttributeSet
 import android.view.MotionEvent
 import android.view.View
+import com.furongsoft.drawtoolsdemo.entities.shapes.Ellipse
 import com.furongsoft.drawtoolsdemo.entities.shapes.IShape
 import com.furongsoft.drawtoolsdemo.entities.shapes.Rectangle
 import java.lang.reflect.Constructor
@@ -30,11 +31,6 @@ class DrawingBoardView : View, View.OnTouchListener {
      * 当前操作形状
      */
     var currentShape: IShape? = null
-
-    /**
-     * 选中形状
-     */
-    var selectedShape: IShape? = null
 
     /**
      * 画笔
@@ -85,9 +81,9 @@ class DrawingBoardView : View, View.OnTouchListener {
     private fun initialize() {
         setOnTouchListener(this)
 
-        paint.color = Color.RED
         paint.style = Paint.Style.STROKE
         paint.strokeWidth = 1f
+        paint.color = Color.RED
     }
 
     private fun onTouchShape(view: View?, event: MotionEvent?) {
